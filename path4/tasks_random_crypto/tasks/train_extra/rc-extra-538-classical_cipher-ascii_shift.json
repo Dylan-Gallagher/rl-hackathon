@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-538-classical_cipher-ascii_shift",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{cz1dqc9q}"
+  },
+  "prompt": "A hacker left a message for you, but shifted each letter using ASCII values. Can you decode ntio\u0083k\u00829lykAy\u0085 to reveal the secret?\n\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

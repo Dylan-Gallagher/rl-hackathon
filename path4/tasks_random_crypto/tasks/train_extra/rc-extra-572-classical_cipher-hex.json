@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-572-classical_cipher-hex",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{16mn5rbs}"
+  },
+  "prompt": "An agent left you a secret message in plain sight\u2014concealed as a string of hexadecimal numbers. Can you decode what 666c61677b31366d6e357262737d means?\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

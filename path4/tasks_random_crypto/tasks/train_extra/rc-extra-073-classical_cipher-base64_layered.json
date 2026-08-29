@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-073-classical_cipher-base64_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{eff98ztf}"
+  },
+  "prompt": "An old hacker encoded the password using Base64. Can you decode this message to find it? Vm0wd2VHUXhUblJWV0d4WFlURndVRlpzWkc5V1JteFZVMnhPYWxKc1NsWldSM1JQWVcxS1IxZHVhRmRTZWtFeFdWVmFTMlJIVmtsalJtUk9ZV3hhVFZaclpEUlpWMDE0VTI1R1ZXSklRbGhXYWtwdlpWWmFjbHBFVWxSTmJFcFlWVzAxUjFVeVNrZFhiR2hYWWxoU1lWcFhlR0ZXYkdSeVYyeENWMkV3Y0ZSV1ZWcFNaREZDVWxCVU1EMD0=\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

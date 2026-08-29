@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-eval-016-classical_cipher-fibonacci_encoding",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{buazs307}"
+  },
+  "prompt": "A message from the Fibonacci Society arrived, hidden in the sequence that bears their name. Only those who know their code can read: 10001000001 10001010011 10000100001 10001000011 10100000001 10000100011 10010010101 10000100001 10010101011 10010010001 101001011 101000011 1000000001 10100000101\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "eval"
+}

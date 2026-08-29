@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-677-classical_cipher-Base85_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{zh1bs96u}"
+  },
+  "prompt": "A hacker left a secret in a desert terminal, but encoded it using Base85. Can you retrieve the message hidden in this ciphertext? Q8+7fbYyZsPf15ALm_fVLM1IeN?KPfc2PuHM|e_NCP5`pSwdDJO)yD&En+lhKrK^KZe)5>S4U$;Q!sjTNMU(aNPS8<OC|\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

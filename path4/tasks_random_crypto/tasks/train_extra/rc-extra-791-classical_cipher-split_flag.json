@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-791-classical_cipher-split_flag",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{lfueiqyy}"
+  },
+  "prompt": "A secret guild split a vital code into numbers and cleverly mixed them. Can you unravel their SplitNumberMix cipher and reveal the hidden message? Ciphertext:  999999999 f 999999999 lag{lf 999999999 ueiqy 999999999 y} 999999999 \n\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

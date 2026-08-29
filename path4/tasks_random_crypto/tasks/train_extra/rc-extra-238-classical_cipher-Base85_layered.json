@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-238-classical_cipher-Base85_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{2o918jik}"
+  },
+  "prompt": "The museum\u2019s vault code is hidden in this Base85 message: Q8;r{Qc74PHh5S&G<irvQ&>?(V|heJa#2HLK|M`Cej_bPdU19@O>SpvQcOt. Can you recover it before the security system resets?\n\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-375-classical_cipher-XOR",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{903u67w5}"
+  },
+  "prompt": "An old hacker left a secret message encrypted with XOR. Can you recover the flag from this cipher? stringA: 0a1f50063d407f5539505a235b28 stringB: 6c73316146794f664c666d546e55\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

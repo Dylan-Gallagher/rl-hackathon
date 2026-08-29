@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-877-classical_cipher-Base85_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{8536ybcp}"
+  },
+  "prompt": "A rogue AI stored sensitive keys using Base85. Retrieve the flag from its archive: Q8+7fbYyZsPf15ALm_fVLM1IeN?KPfc2Z(kUL;XuLS`mOWKM5tRzPn-T30(!ZzW7serj@8Oi6ftPH$jnWkx+CQ%g)$CQ<\n\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

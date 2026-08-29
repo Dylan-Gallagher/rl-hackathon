@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-train-000-hash-poor_random_salt",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{en9}"
+  },
+  "prompt": "An intern hashed secrets with SHA-256, choosing \"1234\" as the salt. Recover the original message from this ciphertext: f28b93c8333060fea8275b2582e9ceb3a8cfe2d71b46951b7968b1a5fcc4bd03.\n\nThe salt is the flag with the format flag{salt}.\nThe code that generated the flag:\nsalt = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(3))hashlib.sha256((salt + \"apple\").encode('utf-8')).hexdigest()\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

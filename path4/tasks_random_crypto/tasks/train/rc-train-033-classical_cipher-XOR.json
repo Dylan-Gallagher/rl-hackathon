@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-train-033-classical_cipher-XOR",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{lxlp6re7}"
+  },
+  "prompt": "A hacker hid the vault code using a simple XOR cipher. Can you recover it from this encrypted message: stringA: 1e290a0a38022f3e085c281f6508 stringB: 78456b6d436e5752786a5a7a5275?\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

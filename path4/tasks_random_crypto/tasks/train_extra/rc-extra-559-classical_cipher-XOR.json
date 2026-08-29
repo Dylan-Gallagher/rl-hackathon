@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-559-classical_cipher-XOR",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{yoh705ht}"
+  },
+  "prompt": "An agent's secret message was intercepted. Rumor says it's XOR-encrypted. Can you reveal the hidden text in this cipher? stringA: 2508132a4a171827065c022f4d44 stringB: 4364724d316e774f316c37473939\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

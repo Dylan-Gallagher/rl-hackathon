@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-102-classical_cipher-Base85_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{5n8mtge6}"
+  },
+  "prompt": "An old hacker left a secret flag encoded using Base85. Can you recover the original message from this strange Q8+7fbYyZsPf15ALm_fVLM1IeN?KPfc2PD!W@<xGWixV9eK~U_R#I#+W=3pFCTLT9DM(dOC22uOT4GjFJ4r-SK|M%fXnX?\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

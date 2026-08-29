@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-127-classical_cipher-XOR",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{ypybvbf9}"
+  },
+  "prompt": "An agent hid coordinates in a message, encrypted it with XOR, and left this clue: stringA: 17291b2d1f28402d5a4e30154f0f stringB: 71457a4a64513054383852737672. Can you recover the secret location?\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

@@ -36,6 +36,9 @@ class ChatClient:
         timeout: float = 120.0,
         retries: int = 3,
         transport: Any | None = None,
+        max_tokens: int | None = None,
+        extra_body: dict[str, Any] | None = None,
+        model_base_urls: dict[str, str] | None = None,
     ):
         self.transport = transport  # injectable for tests (httpx.MockTransport)
         self.base_url = (base_url or os.environ.get("OPENAI_BASE_URL") or DEFAULT_BASE_URL).rstrip("/")
@@ -43,6 +46,10 @@ class ChatClient:
         self.model = model
         self.timeout = timeout
         self.retries = retries
+        # Optional request extensions (per-call ``model`` may override base URL).
+        self.max_tokens = max_tokens
+        self.extra_body = dict(extra_body) if extra_body else None
+        self.model_base_urls = {m: u.rstrip("/") for m, u in (model_base_urls or {}).items()}
 
     async def chat(self, messages: Sequence[dict[str, str]], model: str | None = None) -> dict[str, Any]:
         """Send a chat completion; return ``{content, model, tokens_in, tokens_out}``.
@@ -52,33 +59,71 @@ class ChatClient:
         one (LiteLLM does), else the requested name.
         """
         requested = model or self.model
-        payload = {"model": requested, "messages": list(messages)}
-        headers = {"Authorization": f"Bearer {self.api_key}"}
+        payload = self._payload(requested, messages)
+        base = self.model_base_urls.get(requested, self.base_url)
+
+        def _bearer() -> str:
+            key = self.api_key
+            if callable(key):
+                return str(key())
+            return str(key)
+
         delay = _RETRY_BASE_DELAY
         last_err: Exception | None = None
         async with httpx.AsyncClient(timeout=self.timeout, transport=self.transport) as client:
-            for attempt in range(self.retries + 1):
+            url = f"{base}/chat/completions"
+            empty_retry_used = False
+            attempt = -1  # incremented BEFORE each retry gate; -1 -> first pass
+            while attempt < self.retries:
+                attempt += 1
+                headers = {"Authorization": f"Bearer {_bearer()}"}
                 try:
-                    resp = await client.post(
-                        f"{self.base_url}/chat/completions", json=payload, headers=headers
-                    )
+                    resp = await client.post(url, json=payload, headers=headers)
                 except httpx.HTTPError as e:  # network errors -> retry
                     last_err = e
                 else:
-                    if resp.status_code == 200:
-                        return self._parse(resp.json(), requested)
-                    if resp.status_code == 429 or resp.status_code >= 500:
+                    if resp.status_code == 401:
+                        inv = getattr(self.api_key, "invalidate", None)
+                        if callable(inv):
+                            inv()
+                        last_err = httpx.HTTPStatusError(
+                            "HTTP 401", request=resp.request, response=resp
+                        )
+                    elif resp.status_code == 200:
+                        parsed = self._parse(resp.json(), requested)
+                        # Hybrid reasoners (GLM-4.5+) may return empty
+                        # message.content with everything in reasoning_content;
+                        # retry ONCE with a larger max_tokens budget.
+                        if not parsed["content"] and not empty_retry_used:
+                            empty_retry_used = True
+                            payload = dict(payload)
+                            payload["max_tokens"] = max(
+                                int(payload.get("max_tokens") or 0), 3000
+                            )
+                            continue  # empty-content retry: does not consume a retry slot
+                        return parsed
+                    elif resp.status_code == 429 or resp.status_code >= 500:
                         last_err = httpx.HTTPStatusError(
                             f"HTTP {resp.status_code}", request=resp.request, response=resp
                         )
+                    elif resp.status_code == 401:
+                        pass  # last_err set; retry with refreshed bearer
                     else:
-                        resp.raise_for_status()  # 4xx other than 429: fail fast
+                        resp.raise_for_status()  # other 4xx: fail fast
                 if attempt == self.retries:
                     break
                 await asyncio.sleep(delay + random.uniform(0, _RETRY_JITTER))
                 delay *= 2
         assert last_err is not None
         raise last_err
+
+    def _payload(self, requested: str, messages: Sequence[dict[str, str]]) -> dict[str, Any]:
+        payload: dict[str, Any] = {"model": requested, "messages": list(messages)}
+        if self.max_tokens is not None:
+            payload["max_tokens"] = self.max_tokens
+        if self.extra_body:
+            payload.update(self.extra_body)
+        return payload
 
     @staticmethod
     def _parse(data: dict[str, Any], requested: str) -> dict[str, Any]:

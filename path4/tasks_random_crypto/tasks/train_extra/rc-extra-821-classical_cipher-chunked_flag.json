@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-821-classical_cipher-chunked_flag",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{9pim9qw3}"
+  },
+  "prompt": "Intercepted messages from a secretive DAO are encrypted with the mysterious ChunkedFlag cipher. Can you reveal the hidden flag from this scrambled ciphertext? fl ag {9 pi m9 qw3 }\n\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

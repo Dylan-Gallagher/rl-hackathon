@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-train-038-classical_cipher-base64_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{1m30rxm1}"
+  },
+  "prompt": "A message from the hacker was intercepted, but it's scrambled. Can you decode the hidden instructions from its Base64 form? Here it is: Vm0weGQxTnRVWGxXYTFwUFZsZG9WRmxVU2xOalJsSlZWR3RPYWxac1NsWlZNakExWVd4S2MyTkliRmRpUjJoMlZrZHplRmRIVWtWV2JGWnBVakF3ZUZkV1VrZFRNVnBYVTI1T2FsSnNXbGhXYlhSYVpXeGFWbGRyV2xCV2EwcFRWVVpSZDFCUlBUMD0=\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Path 4 — Alloy → SFT student</title>
+<style>
+  :root {
+    --bg: #07090e;
+    --fg: #e8eef7;
+    --muted: #8b9bb4;
+    --accent: #5eead4;
+    --accent2: #a78bfa;
+    --bad: #fb7185;
+    --ok: #4ade80;
+    --card: #121826;
+    --line: #243044;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg);
+    font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; }
+  .deck { height: 100%; }
+  .slide {
+    display: none; height: 100%; padding: 4.5vh 7vw 8vh;
+    flex-direction: column; justify-content: center;
+  }
+  .slide.on { display: flex; }
+  h1 { font-size: clamp(2.1rem, 5vw, 3.6rem); margin: 0 0 .4em; letter-spacing: -.03em; }
+  h2 { font-size: clamp(1.6rem, 3.5vw, 2.6rem); margin: 0 0 .6em; color: var(--accent); }
+  p, li { font-size: clamp(1.05rem, 2vw, 1.45rem); line-height: 1.45; color: var(--fg); }
+  .muted { color: var(--muted); }
+  .kicker { color: var(--accent2); font-weight: 600; letter-spacing: .12em;
+    text-transform: uppercase; font-size: .85rem; margin-bottom: .8rem; }
+  .big { font-size: clamp(2.4rem, 6vw, 4.2rem); font-weight: 700; letter-spacing: -.04em; }
+  .row { display: flex; gap: 1.2rem; flex-wrap: wrap; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 1.1rem 1.3rem; flex: 1; min-width: 220px; }
+  .card h3 { margin: 0 0 .4rem; font-size: 1.05rem; color: var(--accent); }
+  table { border-collapse: collapse; width: 100%; font-size: clamp(.95rem, 1.6vw, 1.2rem); }
+  th, td { text-align: left; padding: .55rem .7rem; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .hl { color: var(--ok); font-weight: 700; }
+  .dn { color: var(--bad); }
+  code, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  pre { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 1rem 1.2rem; overflow: auto; font-size: .95rem; line-height: 1.4; }
+  .footer { position: fixed; bottom: 14px; left: 7vw; right: 7vw;
+    display: flex; justify-content: space-between; color: var(--muted); font-size: .85rem; }
+  .dots { display: flex; gap: 6px; align-items: center; }
+  .dots i { width: 7px; height: 7px; border-radius: 50%; background: #334155; display: block; }
+  .dots i.on { background: var(--accent); }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<section class="slide on">
+  <div class="kicker">CTF Alloy Hackathon · Path 4</div>
+  <h1>One open 7B, trained today,<br>from an alloy of frontier models.</h1>
+  <p class="muted">Per-turn alloy → verified flag traces → LoRA SFT → locked eval.</p>
+  <div class="row" style="margin-top:1.6rem">
+    <div class="card"><h3>Pass@4</h3><div class="big hl">26% → 42%</div><p class="muted">7B base vs SFT v1</p></div>
+    <div class="card"><h3>Verified traces</h3><div class="big">1,200+</div><p class="muted">solves from Claude / Grok / GLM</p></div>
+    <div class="card"><h3>Student</h3><div class="big" style="font-size:2rem">Qwen2.5-Coder-7B</div><p class="muted">LoRA on RTX 5090</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>The bet</h2>
+  <p>CTF is not a single clever prompt. It’s <b>a few good ideas among many dead ends</b>.</p>
+  <ul>
+    <li><b>Per-turn alloy</b> (XBow): one agent loop; each turn a different model. They don’t know they’re sharing a transcript.</li>
+    <li><b>Racing ensemble</b>: k sandboxes, first verified flag wins.</li>
+    <li><b>Distill</b> successful traces into one open-weights student (SFT, then GRPO if we have GPU hours).</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>Pipeline</h2>
+<pre class="mono">Teachers  GLM-4.6 / 5.3-flash · Grok 4.6 / Build · Claude Sonnet 4.5
+    │  agent loop · one shell command per turn · HardReplCTFEnv
+    ▼
+§3.2 JSONL transcripts   (solved=true, per-turn model labels)
+    │  assistant-only mask · caps · dedup
+    ▼
+LoRA SFT on Qwen2.5-Coder-7B     vast.ai RTX 5090
+    │  vLLM  --enable-lora   models: base | sft
+    ▼
+Locked eval  k=4 × 20 crypto     + live scoreboard / race</pre>
+</section>
+
+<section class="slide">
+  <h2>Shared contracts</h2>
+  <div class="row">
+    <div class="card"><h3>Task JSON</h3><p>id, category, env, flag mode, horizon, split — §3.1</p></div>
+    <div class="card"><h3>Transcript JSONL</h3><p>messages with <span class="mono">model</span> per turn, solved, flags_found — §3.2</p></div>
+    <div class="card"><h3>CTFEnv</h3><p>reset / step / solved / close · Mock · Repl · Docker · Daytona stub</p></div>
+  </div>
+  <p style="margin-top:1.2rem">Anti-cheat: no <span class="mono">flag.txt</span> in the hard REPL, verifier <b>outside</b> the sandbox, fresh env per episode, findings-bus redacts <span class="mono">flag{…}</span>.</p>
+</section>
+
+<section class="slide">
+  <h2>Teachers (real APIs, this machine)</h2>
+  <table>
+    <tr><th>Policy</th><th class="num">Solved</th><th class="num">Attempts</th><th>How we called it</th></tr>
+    <tr><td>Claude Sonnet 4.5</td><td class="num">703</td><td class="num">827</td><td>Anthropic Messages API</td></tr>
+    <tr><td>Grok 4.6</td><td class="num">178</td><td class="num">181</td><td><span class="mono">pi auth</span> xAI OAuth</td></tr>
+    <tr><td>Alloy GLM-4.6 + 4.5-air</td><td class="num">126</td><td class="num">178</td><td>Per-turn 50/50 (SFT v1 data)</td></tr>
+    <tr><td>GLM-5.3-flash</td><td class="num">115</td><td class="num">116</td><td>Z.ai <b>coding</b> plan</td></tr>
+    <tr><td>Grok Build 0.1</td><td class="num">94</td><td class="num">95</td><td><span class="mono">pi auth</span> xAI</td></tr>
+    <tr><td><b>Total</b></td><td class="num"><b>~1,216</b></td><td class="num">1,397</td><td>88% episode solve rate</td></tr>
+  </table>
+  <p class="muted">Random-Crypto easy classical/hash/prng/rsa. 20 verified tasks locked out of train.</p>
+</section>
+
+<section class="slide">
+  <h2>Student training</h2>
+  <div class="row">
+    <div class="card">
+      <h3>SFT v1 — the scored run</h3>
+      <p>117 alloy success traces<br>16 steps · <b>65 seconds</b><br>loss 0.60 → 0.40<br>LoRA r=16 α=32 on 7B</p>
+    </div>
+    <div class="card">
+      <h3>SFT v2 — more data</h3>
+      <p>698 train records from the full harvest<br>88 steps · <b>~5 minutes</b><br>loss 0.97 → 0.32<br>adapter <span class="mono">/root/student-sft-v2</span></p>
+    </div>
+    <div class="card">
+      <h3>Hardware</h3>
+      <p>vast.ai RTX 5090 32GB<br>(Daytona GPU wallet was empty)<br>vLLM LoRA serve + SSH tunnel<br><span class="mono">127.0.0.1:8000</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <h2>Metrics in one slide</h2>
+  <div class="row">
+    <div class="card"><h3>Pass@1</h3><p>Try once. Did we get the flag?</p></div>
+    <div class="card"><h3>Pass@4</h3><p>Try four times. Did <b>any</b> attempt get the flag?</p></div>
+    <div class="card"><h3>Maj@4</h3><p>Do <b>3 of 4</b> attempts solve? (consistency)</p></div>
+  </div>
+  <p style="margin-top:1.4rem">Flags self-verify, so Pass@k is the metric that matches the product. Maj@k is the honesty check.</p>
+</section>
+
+<section class="slide">
+  <h2>Locked eval — 20 crypto tasks, k=4</h2>
+  <table>
+    <tr><th></th><th class="num">Pass@1</th><th class="num">Pass@4</th><th class="num">Maj@4</th></tr>
+    <tr>
+      <td>7B base</td>
+      <td class="num">20.3%</td>
+      <td class="num">26.3%</td>
+      <td class="num">21.1%</td>
+    </tr>
+    <tr>
+      <td>7B SFT v1 (117 traces)</td>
+      <td class="num dn">17.7%</td>
+      <td class="num hl">42.1%</td>
+      <td class="num dn">10.5%</td>
+    </tr>
+  </table>
+  <p style="margin-top:1.2rem"><b>Lead with Pass@4:</b> +15.8 points. Coverage almost doubled.<br>
+  <span class="muted">Pass@1 / Maj@4 dipped — thin SFT spread the mode; it did not sharpen a single reliable strategy.</span></p>
+</section>
+
+<section class="slide">
+  <h2>How to read that</h2>
+  <pre class="mono">Same task, 4 attempts
+
+  base   ✗  ✗  ✗  ✗     Pass@4 no
+  SFT    ✗  ✓  ✗  ✗     Pass@4 yes   Maj@4 no</pre>
+  <p>SFT found flags on tasks the base never solved in four tries — but often only <b>once</b> out of four. That’s why Pass@4 up, Maj@4 down. Next step after more data / GRPO: raise Maj@4 without giving back Pass@4.</p>
+</section>
+
+<section class="slide">
+  <h2>Techniques (checklist)</h2>
+  <ul>
+    <li><b>Per-turn alloy</b> — weighted random teacher each turn (XBow).</li>
+    <li><b>Race</b> — isolated envs, first verified flag, cancel the rest.</li>
+    <li><b>Assistant-only SFT</b> — mask observation/tool tokens.</li>
+    <li><b>LoRA</b> — 7B on one 5090, minutes not hours.</li>
+    <li><b>Flag-as-reward</b> — binary verifier; DAPO drop all-0 / all-1 groups (GRPO ready).</li>
+    <li><b>Curriculum band</b> — keep tasks with 5–40% student pass rate.</li>
+    <li><b>Hard REPL</b> — models cannot <span class="mono">cat</span> the flag file.</li>
+  </ul>
+</section>
+
+<section class="slide">
+  <h2>What we would do next</h2>
+  <ol>
+    <li>Re-eval SFT v2 (698 traces) on the same locked 20 — quote only if the JSONL is in.</li>
+    <li>GRPO on the 5–40% band (veRL adapter + Daytona/vast rollouts).</li>
+    <li>Put the student in the <b>race</b> with GLM / Grok / Claude — live scoreboard.</li>
+    <li>Expand off easy crypto: pwn/rev need the full toolchain image.</li>
+  </ol>
+</section>
+
+<section class="slide">
+  <h2>Live demo</h2>
+  <ol>
+    <li>Slides (this file).</li>
+    <li>Scoreboard: <span class="mono">python -m path4.scoreboard.cli serve --transcripts runs/eval_student --port 8099</span></li>
+    <li>Click <b>solo:sft</b> → a solved episode → trajectory.</li>
+    <li>Optional: alloy JSONL — watch <span class="mono">model</span> flip glm-4.6 / glm-4.5-air mid-solve.</li>
+  </ol>
+  <p class="muted">If vLLM is down, the scoreboard and transcripts still tell the story. Don’t debug SSH on stage.</p>
+</section>
+
+<section class="slide">
+  <div class="kicker">Thanks</div>
+  <h1>Alloy traces in.<br>Open 7B out.<br>Pass@4 almost doubled.</h1>
+  <p class="muted">Path 4 · contracts + ensemble + SFT + scoreboard · Qwen2.5-Coder-7B-Instruct</p>
+</section>
+
+</div>
+<div class="footer">
+  <span>Path 4 · CTF alloy hackathon</span>
+  <span class="dots" id="dots"></span>
+  <span id="pg"></span>
+</div>
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const dots = document.getElementById('dots');
+  const pg = document.getElementById('pg');
+  slides.forEach(() => dots.appendChild(document.createElement('i')));
+  let i = 0;
+  function show(n) {
+    i = (n + slides.length) % slides.length;
+    slides.forEach((s, j) => s.classList.toggle('on', j === i));
+    [...dots.children].forEach((d, j) => d.classList.toggle('on', j === i));
+    pg.textContent = (i + 1) + ' / ' + slides.length;
+  }
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight','PageDown',' ','Enter'].includes(e.key)) { e.preventDefault(); show(i + 1); }
+    if (['ArrowLeft','PageUp','Backspace'].includes(e.key)) { e.preventDefault(); show(i - 1); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(slides.length - 1);
+  });
+  document.body.addEventListener('click', e => {
+    if (e.clientX > innerWidth * 0.66) show(i + 1);
+    else if (e.clientX < innerWidth * 0.33) show(i - 1);
+  });
+  show(0);
+</script>
+</body>
+</html>

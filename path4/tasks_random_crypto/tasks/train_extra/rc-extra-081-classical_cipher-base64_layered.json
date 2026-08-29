@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-081-classical_cipher-base64_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{zoqsbgb1}"
+  },
+  "prompt": "A hacker left you a hidden flag\u2014can you decode their Base64 message? Here it is: VmpJd2VFNUhSa2RpTTNCclVrWndjRlJVUW1GT2JHUllUVmQwYUZaVVJscFVWVkYzVUZFOVBRPT0=\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

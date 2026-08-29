@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-961-classical_cipher-XOR",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{i5hxitzq}"
+  },
+  "prompt": "The hacker intercepted a secret transmission protected by a simple XOR cipher. Can you recover the hidden message from the code below? stringA: 281e06261e2f7b27005b40364308 stringB: 4e72674165464e4f7832344c3275\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

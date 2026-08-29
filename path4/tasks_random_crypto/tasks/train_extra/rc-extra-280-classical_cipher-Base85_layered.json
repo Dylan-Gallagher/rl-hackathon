@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-280-classical_cipher-Base85_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{kmdx3h5e}"
+  },
+  "prompt": "An agent left a secret message in a Base85 code. Decode Q8+6$C09T(Kr2)>FllT?Dp5>4T0>tyaZhPwOiNd6Y-Ax&En-MNO>tjAS7K6qd@@#TRB%c}a4J_ZRz788M`2fJUS3i&Y$#GvVL?%RNJBYgWn)k#BU4FPZZTR>K{-!nQZ!#=KUQvgF<M$dcV}TwVE to uncover the meeting location.\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

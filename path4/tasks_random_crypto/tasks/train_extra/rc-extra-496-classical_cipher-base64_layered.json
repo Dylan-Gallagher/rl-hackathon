@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-496-classical_cipher-base64_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{eqrhjccx}"
+  },
+  "prompt": "An agent hid coordinates using an ancient encoding. Decode the Base64 message below to reveal the secret location: Vm0xd1NtUXlWa1pPVldoVFlUSlNjRlJVVGtOamJGWnhWRzA1YWxac2JETldiVFZyWVRKS1NHVkdiRlZXYkZVeFdWVmtTMVl4WkhKalJsWlhWbXRaZWxaVldrWlBWa0pTVUZRd1BRPT0=\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

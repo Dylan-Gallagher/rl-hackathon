@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-train-012-classical_cipher-Base85_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{cm8ptgf7}"
+  },
+  "prompt": "An anonymous hacker left a message encoded in Base85. Can you decode their secret? Ciphertext: Q8+7fbYyZsPf15ALm_fVLM1IeN?KPfc2F%jWi~=~GCxvLL49K~LsV`yUQIuFBzaR-Bz7@lbvR;VWl?)jUQ#A<LQ+RVD0l\n\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

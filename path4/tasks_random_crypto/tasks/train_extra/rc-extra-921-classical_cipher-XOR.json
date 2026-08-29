@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-921-classical_cipher-XOR",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{e3u3l4w0}"
+  },
+  "prompt": "Intercepted spy messages were scrambled using a simple XOR cipher. Can you recover the vital clue encoded here: stringA: 3c14232a4c15413a020f4c1d774e stringB: 5a78424d3770724f3163786a4733?\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

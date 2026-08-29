@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-554-classical_cipher-Base64_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{zorgsqql}"
+  },
+  "prompt": "You find a secret note titled \"B64 Formula.\" The message appears scrambled. Can you decode its hidden meaning? Ciphertext: Vm0wd2QyVkhVWGhVYmxKV1YwZDRXRmxVUm5kVlJscHpXa2M1VjFKdGVGWlZNbmhQWVd4S2MxTnNXbGRTTTFKUVdWY3hTMUl4WkhWaVJtUk9ZV3hhZVZkV1pEUlRNazE0Vkc1T1dHSkdjRmhhVjNoaFpWWmtWMVZyWkZwV01VcEpWbGR3WVZaSFNraFZiRkpWVmtWYVRGcFdXbXRYUjFKSVVteFNhVlpyV1RGV2EyUXdXVmRHYzFOdVRsaGlSMmhZV1d4b1UxbFdjRmhsUjBaWFlrZFNlVll5ZUVOV01rVjNZMFpTVjFaV2NGTmFSRVpEVld4Q1ZVMUVNRDA9\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

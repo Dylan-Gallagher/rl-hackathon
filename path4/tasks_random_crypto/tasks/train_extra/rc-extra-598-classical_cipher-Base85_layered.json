@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-598-classical_cipher-Base85_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{d3x3d96f}"
+  },
+  "prompt": "A hacker left a secret message encoded in Base85 on a sticky note: Q8+6$C09T(Kr2)>FllT?Dp5>4T0>tyaZhPwOiNd6Y-Ax&En-MNO>0s&Bu7R=L|##0O;u=GLL*pDL~d?ON=$JvP-9{=SXOycT3B{dLtr#MUP@RcXDCl;DRp^AYCk-FPitsXD^71XBxF!%WNAfCWB. Can you decode it to reveal their password?\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

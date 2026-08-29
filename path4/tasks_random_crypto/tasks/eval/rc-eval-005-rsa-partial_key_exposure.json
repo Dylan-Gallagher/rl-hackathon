@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-eval-005-rsa-partial_key_exposure",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{yhzza45x}"
+  },
+  "prompt": "The RSA keys were sloppily generated, accidentally leaking half the private key. Can you decrypt the intercepted message? Ciphertext: 1137580230142902712981298361750399018662906872936500711317044762633701943904644010438670714760642157161551351183961960973188155059492801577439299695568317\n\nThe flag format is flag{...}\nn=7437793426948502191444587007881092359724890016716650593731288102602778626248717535234310996752585259836617986908461684546144422373034770139775419511269569, e=5349694973872601616093415804785562830105695784302131378605883428363639497504849657856391745172646072890147419240025494325299589223146628059339531820406489, partial_p=13609762500764892393\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "eval"
+}

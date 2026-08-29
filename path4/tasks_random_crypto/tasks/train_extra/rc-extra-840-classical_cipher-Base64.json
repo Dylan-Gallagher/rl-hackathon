@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-840-classical_cipher-Base64",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{s1bcb2ps}"
+  },
+  "prompt": "A hacker left a secret code online\u2014rumor says it's a password encoded with an old web-safe cipher. Can you uncover the message hidden in ZmxhZ3tzMWJjYjJwc30=?\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

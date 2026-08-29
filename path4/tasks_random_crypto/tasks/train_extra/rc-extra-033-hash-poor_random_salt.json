@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-033-hash-poor_random_salt",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{1he}"
+  },
+  "prompt": "A careless admin used SHA-256 with '1234' as a salt for password hashes. Crack the original password from this weakly salted hash: 8e3fec4cc331945cb516632eb14c5eef9d1b50a997aecc6144c70d233cfeef0c\n\n\nThe salt is the flag with the format flag{salt}.\nThe code that generated the flag:\nsalt = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(3))hashlib.sha256((salt + \"apple\").encode('utf-8')).hexdigest()\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

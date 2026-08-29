@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-eval-019-classical_cipher-XOR",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{ssjndcz2}"
+  },
+  "prompt": "A hacker intercepted a secret transmission protected by a simple XOR cipher. Crack the message: stringA: 3309520b1d4a4a3b2d5002180213 stringB: 5565336c6639395143346162306e\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "eval"
+}

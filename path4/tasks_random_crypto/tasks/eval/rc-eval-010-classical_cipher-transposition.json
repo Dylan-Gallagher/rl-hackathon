@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-eval-010-classical_cipher-transposition",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{fqz8misr}"
+  },
+  "prompt": "An ancient hacker left a secret phrase in encrypted form. Only by undoing the strange rearrangement can you reveal it: yr,nicroneacrmdciirepifasni)oaghthlTpipretleylaegsaecialsouithsmitaxefostisconetfsaxianesssphfcwroosiorneocnsscplhGprlgaepmdeoAcciad)g8}cohroohloauohshepwsbhisaerootcieasssnicrrnfn(cccoucc)rtgsmoaetheaoptTifutnehohtsniptuthtieveeieenstnstpitreb,hrcreDcrmhqtrohieraEpSaElqsrgyasneswptneaonthcletorrasnhhnccte.stisdipttahtrphtadouytdcrwirtflehfrbucrinahiotleteahtmestfnttpidtieoheniaiiistFiopiuyynokmnnnttrSazrIpaasti(karti)eorocasoocc(stwuntaeevroohersaxplrrrorrcnratpcpeiauohityemtip,htgpiuoitndgute.ieeeeasnutnasyfoeitahieVhcehlntestdderon(.{mntptpipansmipitfynhmtsnhttpiitghrrmeasneouoitiyasofasogererehxcptnen.drsiohwdceoonfnbscenhlDtdrbeniabuot,atmdnolekAXeox-icitlhevdyndAffi\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "eval"
+}

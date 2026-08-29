@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-017-classical_cipher-split_flag",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{gjrvyxgx}"
+  },
+  "prompt": "An encrypted vault code was intercepted. Rumor says it's protected by the SplitNumberMix method. Can you recover the original number from this cipher?  555555 fl 555555 ag{gjrv 555555 y 555555 xgx} 555555 \n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

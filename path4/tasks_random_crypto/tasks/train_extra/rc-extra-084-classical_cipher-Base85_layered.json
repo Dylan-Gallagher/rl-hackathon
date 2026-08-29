@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-084-classical_cipher-Base85_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{11j5ud8s}"
+  },
+  "prompt": "Intercepted data from a hacker uses an obscure Base85 cipher. Decode the secret to reveal their next target: Q8+6$C09T(Kr2)>FllT?Dp5>4T0>tyaZhPwOiNd6Y-Ax&En-MNP$(v4L}55jRw+y~LufNcDn2DCSWI_kK2jx1J6TXeBSn5wdOTHFQDS3eGDs>%UQl6GUN$^UO;1vMOfw}@URP{vRd7u{Q!O%Deg\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

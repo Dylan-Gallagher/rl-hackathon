@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-237-classical_cipher-Base85_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{d1hhiltx}"
+  },
+  "prompt": "Someone left a secret message on a hacker forum, but it's encoded strangely. Can you decode the mysterious Base85 string? Here it is: Q8+6$C09T(Kr2)>FllT?Dp5>4T0>tyaZhPwOiNd6Y-Ax&En-MNO>0s&Bu7R=L|#!^AxuqVQA~O%VKrzZVPR!9b7ojXesw=kV>3o>OMP>FI8!n_QZ+($crA2QdvQo6Q+IYZAx&RSNMl1_WlU3JO8\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

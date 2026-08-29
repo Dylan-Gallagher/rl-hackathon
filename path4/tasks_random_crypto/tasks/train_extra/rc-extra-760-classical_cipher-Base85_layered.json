@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-760-classical_cipher-Base85_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{at8g6074}"
+  },
+  "prompt": "An old developer's diary hides its secrets in a Base85-encoded clue. Can you reveal the lost code? Here\u2019s the entry: Q8sTRJX$6xX;4yHCOAP$S6W^pQAJpDDNI!;ZFg5oOI2`MRR\n\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

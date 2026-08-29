@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-016-classical_cipher-split_flag",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{oqzljkmf}"
+  },
+  "prompt": "An elusive hacker left a note hidden in a SplitNumberMix-encrypted message. Can you reveal their secret by cracking this cipher? The message:  55555555 flag{o 55555555 qz 55555555 l 55555555 jkmf} 55555555 \n\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-011-classical_cipher-split_flag",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{cricwtnd}"
+  },
+  "prompt": "Professor Byte encrypted his launch codes with the SplitNumberMix cipher. He left this note: \" 99999 flag 99999 {c 99999 ricwt 99999 nd} 99999 \". Can you decrypt it and stop the launch in time?\n\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

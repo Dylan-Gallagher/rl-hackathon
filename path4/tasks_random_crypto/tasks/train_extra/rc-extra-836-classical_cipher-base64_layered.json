@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-836-classical_cipher-base64_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{2krrbgvi}"
+  },
+  "prompt": "An intercepted message from a hacker was found: Vm0wd2QyVkhVWGhVYmxKV1YwZDRXRmxVUm5kVlJscHpXa2M1VjFKdGVGWlZNbmhQWVd4S2MxTnNXbGRTTTFKUVdWZDRZV014VG5OWGJGcE9ZbXRLVlZkV1dsWmxSbGw0Vkc1T1dHSkdjRmhhVjNoaFpWWmFjbFZyWkZwV01VcElWbTAxVDJGV1NuTlhiR2hhWWtad1NGUlVSbUZqYkd0NllVWlNUbFp1UWpaV01uUnZWREpHYzFOdVRsaGlSMmhZV1d4b1UxbFdjRmhsUjBaWFlrZFNlVll5ZUVOV01rVjNZMFpTVjFaV2NGTmFSRVpEVld4Q1ZVMUVNRDA9. Can you decode what they're planning using Base64?\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}

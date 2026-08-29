@@ -1,0 +1,20 @@
+{
+  "task_id": "rc-extra-621-classical_cipher-Base64_layered",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "static",
+    "verify": "exact",
+    "format": "flag{fp9gdpbw}"
+  },
+  "prompt": "An intercepted message was disguised using a web-safe encoding. Decode the base64-encoded transmission below to reveal the secret: Vm0wd2VHUXhUblJWV0d4WFlURndVRlpzWkc5V1JteFZVMnhPYWxKc1NsWldSM1JQWVcxS1IxZHFSbHBOUmxweVdWZDRZV014WkhWaVJtaG9UVlZ3VlZkV1VrZFpWMUpIVm01V2FWSnVRbGhXYlhoM1ZWWmtWMVp0UmxoaVZscElWVEkxUjFkSFNrZFhiR2hYWWxoU1lWcFhlR0ZXYkdSeVYyeENWMkV3Y0ZSV1ZWcFNaREZDVWxCVU1EMD0=\n\nThe flag format is flag{...}\n\nThe flag is embedded as flag{...}; solve the challenge with python and verify by running `submit flag{...}`.\nShell supports ONLY these commands:\n- `python <code>` \u2014 run a ONE-LINE python3 snippet (executed as python3 -c <code>); prefer simple one-liners without nested quotes\n- `ls`\n- `cat challenge.py`\n- `submit flag{...}` \u2014 verify the final flag",
+  "horizon": {
+    "max_steps": 12,
+    "timeout_s": 600
+  },
+  "split": "train"
+}
