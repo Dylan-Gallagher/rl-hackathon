@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ctf-alloy-distillation"
+version = "0.1.0"
+description = "Per-turn LLM alloy evaluation and CTF trace distillation"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "PyYAML>=6.0.2,<7",
+]
+
+[project.optional-dependencies]
+proxy = [
+  "litellm[proxy]>=1.100.0,<2",
+]
+train = [
+  "accelerate>=1.2,<2",
+  "bitsandbytes>=0.45,<1; platform_system == 'Linux'",
+  "datasets>=3.2,<5",
+  "peft>=0.14,<1",
+  "transformers>=4.48,<6",
+  "trl>=0.20,<1",
+]
+dev = [
+  "pytest>=8.3,<9",
+  "ruff>=0.9,<1",
+]
+
+[project.scripts]
+alloy-distill = "alloy_distillation.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/alloy_distillation"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "UP"]
