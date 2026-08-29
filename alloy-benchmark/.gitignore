@@ -1,0 +1,14 @@
+# secrets / local env
+.env
+*.pem
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+# experiment data & large clones (not committed)
+trajectories/
+challenges/
+ctf-archive/
+CTF-Dojo/
+/tmp/

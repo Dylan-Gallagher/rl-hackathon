@@ -1,0 +1,4 @@
+daytona>=0.207
+anthropic>=1.2
+openai>=3.0
+tenacity>=8.0
