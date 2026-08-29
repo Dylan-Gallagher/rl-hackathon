@@ -1,0 +1,54 @@
+# veRL agentic GRPO skeleton for Path 4 (README Path 4 step 2).
+# This is a CONFIG SHAPE, not a verbatim verl recipe — values marked
+# "# CONFIRM" must be checked against the installed veRL version's
+# recipe/config schema (they move between releases). Consumed by
+# path4/verl_grpo/run_grpo.sh and a custom recipe (see README).
+# Docs: https://verl.readthedocs.io/en/latest/start/agentic_rl.html
+
+data:
+  # Curriculum output from path4/verl_grpo/curriculum.py (EI 5–40% pass-rate band).
+  train_files: path4/verl_grpo/data/curriculum.json
+  val_files: path4/verl_grpo/data/curriculum.val.json
+  # tool config points at OUR executor module (veRL imports it dynamically). # CONFIRM key name
+  tool_config:
+    module: path4.verl_grpo.ctf_tool_executor
+    class: CTFToolExecutor          # async execute(action, state) hook
+    kwargs:
+      max_output_chars: 4000        # keep tool dumps out of the 8k context
+    env: mock                       # mock | docker | daytona (daytona = DaytonaCTFEnv)
+
+algorithm:
+  adv_estimator: grpo
+  actor:
+    # Cold-start SFT student from path4/coldstart (alloy → traces → SFT → EI → GRPO).
+    model:
+      path: runs/sft_coldstart      # PLACEHOLDER: Path 4 step 1 output checkpoint
+    optim:
+      lr: 1.0e-6                    # RL on top of SFT: much smaller than SFT lr
+    lora:
+      r: 16
+      alpha: 32                     # LoRA everywhere (one H100-class GPU, README §6)
+    kl:
+      coef: 0.001                   # small KL to cold-start anchor; too high kills exploration
+    max_turns: 40                   # TRAIN horizon 40 (README: 80 for eval); long horizons blow budget
+
+rollout:
+  mode: async                       # rollouts are network calls (Daytona sandboxes)
+  n: 8                              # group_size: 8 minimum for reward variance; 16 if GPU allows
+  temperature: 1.0
+  max_response_len: 2048
+  stop:
+    - "\nobservation:"              # single-turn-per-step action format
+
+reward:
+  type: binary_flag                 # flag_reward(): 0/1 via env verifier — the WHOLE reward
+  source: tool_executor             # reward comes from the executor's `reward` field
+
+filter:
+  dynamic_sampling: true            # DAPO: drop all-zero / all-one groups (reward.dapo_filter)
+  keep_fraction: null               # CONFIRM semantics vs verl version
+
+trainer:
+  total_epochs: 1                   # one pass over curriculum; EI refresh between epochs
+  logger: ["console", "wandb"]
+  save_freq: 50

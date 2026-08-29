@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CTF Scoreboard — Path 4 Live</title>
+<style>
+  :root{
+    --bg:#0b0e14; --panel:#121722; --panel2:#0e1320; --line:#1f2836;
+    --fg:#d7e0ee; --dim:#7c8aa0; --accent:#39e6a5; --accent2:#5ac8fa;
+    --pwn:#ff6b6b; --rev:#ffb84d; --crypto:#c792ea; --web:#5ac8fa; --forensics:#39e6a5; --misc:#98a9bf;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 "SF Mono",Menlo,Consolas,monospace;}
+  a{color:var(--accent2)}
+  header{display:flex;justify-content:space-between;align-items:baseline;padding:14px 20px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#10151f,transparent);text-shadow:0 0 12px rgba(57,230,165,.25)}
+  header h1{margin:0;font-size:18px;letter-spacing:.08em;color:var(--accent)}
+  header .meta{color:var(--dim);font-size:12px}
+  .stale{color:var(--pwn)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  th{color:var(--dim);font-weight:600;letter-spacing:.05em;font-size:11px;text-transform:uppercase}
+  td.policy,th.policy{text-align:left;cursor:pointer}
+  tbody tr:hover{background:var(--panel2)}
+  tbody tr{cursor:pointer}
+  .chips{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+  .chip{padding:1px 6px;border-radius:8px;font-size:10px;background:rgba(255,255,255,.06)}
+  .chip[data-cat=pwn]{color:var(--pwn)} .chip[data-cat=rev]{color:var(--rev)}
+  .chip[data-cat=crypto]{color:var(--crypto)} .chip[data-cat=web]{color:var(--web)}
+  .chip[data-cat=forensics]{color:var(--forensics)} .chip[data-cat=misc],.chip[data-cat=unknown]{color:var(--misc)}
+  .best{color:var(--accent);text-shadow:0 0 8px rgba(57,230,165,.4)}
+  .panel{position:fixed;top:0;right:-620px;width:600px;max-width:92vw;height:100vh;background:var(--panel);
+    border-left:1px solid var(--line);transition:right .25s ease;display:flex;flex-direction:column;z-index:10}
+  .panel.open{right:0;box-shadow:-8px 0 40px rgba(0,0,0,.6)}
+  .panel header{padding:10px 14px}
+  .panel h2{margin:0;font-size:14px;color:var(--accent)}
+  .close{cursor:pointer;color:var(--dim);margin-left:auto}
+  .panel-body{overflow-y:auto;padding:0 14px 20px;flex:1}
+  .ep{padding:6px 8px;border:1px solid var(--line);border-radius:6px;margin:6px 0;cursor:pointer;background:var(--panel2)}
+  .ep:hover{border-color:var(--accent2)}
+  .badge{padding:0 6px;border-radius:8px;font-size:10px}
+  .badge.solved{background:rgba(57,230,165,.15);color:var(--accent)}
+  .badge.failed{background:rgba(255,107,107,.15);color:var(--pwn)}
+  .msg{border-left:3px solid var(--line);padding:6px 10px;margin:8px 0;background:var(--panel2);border-radius:0 6px 6px 0}
+  .msg.assistant{border-left-color:var(--accent)}
+  .msg.tool{border-left-color:var(--dim);opacity:.8}
+  .msg.user{border-left-color:var(--accent2)}
+  .msg .who{font-size:10px;color:var(--dim);letter-spacing:.05em}
+  .msg .content{white-space:pre-wrap;word-break:break-word;margin-top:3px}
+  .msg.tool .content{color:var(--dim)}
+  .msg.assistant .content{font-family:inherit}
+  details summary{cursor:pointer;color:var(--accent2);font-size:11px}
+  .traj-meta{color:var(--dim);font-size:12px;margin:8px 0}
+  .empty{padding:40px;text-align:center;color:var(--dim)}
+</style>
+</head>
+<body>
+<header>
+  <h1>&gt;_ CTF ALLOY SCOREBOARD <span style="color:var(--dim)">// live</span></h1>
+  <div class="meta"><span id="ep-count">– episodes</span> · updated <span id="updated">–</span></div>
+</header>
+<table>
+  <thead><tr id="head-row"></tr></thead>
+  <tbody id="rows"></tbody>
+</table>
+<div class="empty" id="empty" hidden>No episodes yet — waiting for transcripts…</div>
+
+<aside class="panel" id="panel">
+  <header><h2 id="panel-title">–</h2><span class="close" onclick="closePanel()">[esc] close</span></header>
+  <div class="panel-body" id="panel-body"></div>
+</aside>
+
+<script>
+"use strict";
+const CATS = ["pwn","rev","crypto","web","forensics","misc","unknown"];
+let KS = [1,4,8];
+let hasRaces = false;
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pct = (v) => (v == null || isNaN(v)) ? "–" : (100*v).toFixed(1) + "%";
+const fmt = (v) => (v == null || isNaN(v)) ? "–" : Number(v).toFixed(3);
+
+function fmtChips(cats){
+  const order = Object.keys(cats||{}).sort();
+  return `<span class="chips">` + order.map(c =>
+    `<span class="chip" data-cat="${esc(c)}" title="${esc(c)}: ${cats[c].solves}/${cats[c].episodes} solved">${esc(c.slice(0,4))} ${cats[c].solves}/${cats[c].episodes}</span>`
+  ).join("") + `</span>`;
+}
+
+function renderHeader(){
+  const th = [`<th class="policy">policy</th><th>eps</th><th>solve rate</th>`];
+  for (const k of KS) th.push(`<th>Pass@${k}</th>`);
+  for (const k of KS) if (k>1) th.push(`<th>Maj@${k}</th>`);
+  if (hasRaces) th.push(`<th>race W</th>`);
+  th.push(`<th style="text-align:right">categories</th>`);
+  $("head-row").innerHTML = th.join("");
+}
+
+function renderSummary(s){
+  KS = Array.isArray(s.ks) && s.ks.length ? s.ks : [1,4,8];
+  hasRaces = (s.races|0) > 0;
+  renderHeader();
+  $("ep-count").textContent = `${s.episodes|0} episodes · ${s.policies.length} policies`;
+  $("updated").textContent = new Date().toLocaleTimeString();
+  const kMax = Math.max(...KS);
+  const polys = [...(s.policies||[])].sort((a,b)=>{
+    const av = a.pass_at_k?.[String(kMax)] ?? -1, bv = b.pass_at_k?.[String(kMax)] ?? -1;
+    return bv - av || String(a.policy).localeCompare(String(b.policy));
+  });
+  const best = polys.length ? polys[0].pass_at_k?.[String(kMax)] : null;
+  const rows = polys.map(p => {
+    const td = [`<td class="policy">${esc(p.policy)}</td><td>${p.episodes|0}</td><td>${fmt(p.solve_rate)}</td>`];
+    for (const k of KS) {
+      const v = p.pass_at_k?.[String(k)];
+      const cls = (k===kMax && v!=null && v===best && v>0) ? ' class="best"' : "";
+      td.push(`<td${cls}>${fmt(v)}</td>`);
+    }
+    for (const k of KS) if (k>1) td.push(`<td>${fmt(p.maj_at_k?.[String(k)])}</td>`);
+    if (hasRaces) td.push(`<td>${p.race_wins|0}</td>`);
+    td.push(`<td>${fmtChips(p.categories)}</td>`);
+    return `<tr onclick="showPolicy('${esc(p.policy).replace(/'/g,"&#39;")}')">${td.join("")}</tr>`;
+  });
+  $("rows").innerHTML = rows.join("");
+  $("empty").hidden = polys.length > 0;
+}
+
+async function poll(){
+  try {
+    const r = await fetch("/api/summary");
+    if (!r.ok) throw 0;
+    renderSummary(await r.json());
+  } catch(e) { $("updated").innerHTML = `<span class="stale">offline</span>`; }
+}
+
+// ---- slide-over panel: policy episodes ----
+function openPanel(title){ $("panel-title").textContent = title; $("panel-body").innerHTML = ""; $("panel").classList.add("open"); }
+function closePanel(){ $("panel").classList.remove("open"); }
+document.addEventListener("keydown", e => { if (e.key === "Escape") closePanel(); });
+
+async function showPolicy(policy){
+  openPanel(policy + " — episodes");
+  const body = $("panel-body");
+  body.innerHTML = `<div class="traj-meta">loading…</div>`;
+  try {
+    const r = await fetch(`/api/episodes?policy=${encodeURIComponent(policy)}&limit=100`);
+    const d = await r.json();
+    body.innerHTML = `<div class="traj-meta">${d.total} episodes</div>` + (d.episodes||[]).map(e => `
+      <div class="ep" onclick="showEpisode('${esc(e.episode_id)}')">
+        <span class="badge ${e.solved ? "solved" : "failed"}">${e.solved ? "SOLVED" : "miss"}</span>
+        ${esc(e.task_id)} <span class="traj-meta" style="display:inline">cat:${esc(e.category)} · ${e.steps|0} steps · ${e.n_messages|0} msgs</span>
+      </div>`).join("") || `<div class="empty">no episodes</div>`;
+  } catch(e) { body.innerHTML = `<div class="empty">failed to load episodes</div>`; }
+}
+
+// ---- trajectory viewer ----
+async function showEpisode(id){
+  openPanel(id);
+  const body = $("panel-body");
+  body.innerHTML = `<div class="traj-meta">loading…</div>`;
+  try {
+    const r = await fetch(`/api/episode/${encodeURIComponent(id)}`);
+    if (!r.ok) throw 0;
+    const e = await r.json();
+    const head = `<div class="traj-meta">
+      <span class="badge ${e.solved ? "solved" : "failed"}">${e.solved ? "SOLVED" : "FAILED"}</span>
+      ${esc(e.task_id)} · ${esc(e.policy)} · cat:${esc(e.category)} · ${e.steps|0} steps ·
+      ${e.tokens_in|0} in / ${e.tokens_out|0} out
+      ${e.flags_found && e.flags_found.length ? " · flags: " + esc(e.flags_found.join(", ")) : ""}
+    </div>`;
+    const msgs = (e.messages||[]).map(m => {
+      const who = `<div class="who">turn ${m.turn ?? "?"} · ${esc(m.role)}${m.model ? " · <b>"+esc(m.model)+"</b>" : ""}</div>`;
+      const text = esc(m.content ?? "");
+      let content;
+      if (m.role === "tool" && text.length > 800) {
+        content = `<details><summary>show output (${text.length} chars)</summary><div class="content">${text}</div></details>`;
+      } else {
+        content = `<div class="content">${text}</div>`;
+      }
+      return `<div class="msg ${esc(m.role)}">${who}${content}</div>`;
+    }).join("");
+    body.innerHTML = head + (msgs || `<div class="empty">no messages</div>`);
+    body.scrollTop = 0;
+  } catch(e) { body.innerHTML = `<div class="empty">episode not found</div>`; }
+}
+
+// health ping keeps the badge honest even if summary fails
+async function ping(){
+  try { const r = await fetch("/api/health"); $("updated").classList.toggle("stale", !r.ok); } catch(e) {}
+}
+
+poll(); ping();
+setInterval(poll, 3000);
+setInterval(ping, 10000);
+</script>
+</body>
+</html>

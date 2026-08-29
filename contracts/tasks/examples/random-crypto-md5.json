@@ -1,0 +1,20 @@
+{
+  "task_id": "random-crypto-md5-0001",
+  "source": "random-crypto",
+  "category": "crypto",
+  "env": {
+    "image": "",
+    "launch": "repl"
+  },
+  "flag": {
+    "mode": "generated",
+    "verify": "exact",
+    "format": "flag{uuid4}"
+  },
+  "prompt": "The flag is the MD5 hex digest of the string 'alloy-demo', wrapped as flag{<digest>}. Compute it with python: python import hashlib; print(hashlib.md5(b'alloy-demo').hexdigest())",
+  "horizon": {
+    "max_steps": 40,
+    "timeout_s": 1800
+  },
+  "split": "train"
+}

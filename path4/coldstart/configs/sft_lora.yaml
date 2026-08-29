@@ -1,0 +1,44 @@
+# TRL SFTConfig skeleton for Path 4 cold-start SFT.
+# Loaded by path4/coldstart/train_sft.py (values only — structure mirrors
+# TRL's SFTConfig + PEFT LoraConfig). Every knob has a hackathon rationale.
+
+# --- model ---
+base_model: Qwen/Qwen2.5-Coder-7B-Instruct   # coder-tuned; strong shell/python priors
+# base_model: meta-llama/Llama-3.1-8B-Instruct  # alt: matches HackSynth-GRPO paper (Path 1 parity)
+
+# --- LoRA (LoRA everywhere: one H100-class GPU is enough for 7-8B, README §6) ---
+lora:
+  r: 16            # sweet spot for ~1-2k success traces; bigger r just overfits small data
+  alpha: 32        # 2x r — standard scaling
+  dropout: 0.05    # light regularization on small dataset
+  target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+                  # all attention + MLP projections; partial-target LoRA lost the
+                  # shell-syntax gains in early smoke tests of similar distills
+
+# --- optimization ---
+learning_rate: 1.0e-4   # ~10x full-FT rate is normal for LoRA; higher destabilizes small data
+lr_scheduler_type: cosine
+warmup_ratio: 0.03      # short warmup, long schedule for 2 epochs
+num_train_epochs: 2     # 3rd epoch memorizes alloy quirks (Chu et al. 2025: SFT memorizes)
+per_device_train_batch_size: 2   # 8k-token sequences on one H100
+gradient_accumulation_steps: 8   # effective batch 16 — enough with only ~1k episodes
+bf16: true              # free on H100; don't train 7B in fp32
+
+# --- sequence handling ---
+max_length: 8192        # multi-turn CTF episodes; keep long tool outputs out (see mask)
+packing: false          # packing breaks per-turn assistant-only loss masks — must stay off
+
+# --- loss masking ---
+# train_sft.py supplies a custom data collator that applies OUR per-message
+# `mask` field to labels: only assistant tokens contribute to the loss
+# (README Path 2 step 5). Do NOT rely on TRL's assistant_only_loss template
+# heuristics — our alloy transcripts mix providers and don't match any one
+# chat template. Set to false here; the collator is the source of truth.
+assistant_only_loss: false
+
+# --- logging / output ---
+logging_steps: 5
+save_strategy: epoch
+output_dir: runs/sft_coldstart
+report_to: []
+seed: 0
