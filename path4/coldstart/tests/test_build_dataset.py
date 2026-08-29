@@ -65,6 +65,24 @@ def test_dedup_hash_is_content_sensitive():
     assert h1 != record_hash("t", [{"role": "assistant", "content": "bye"}])
 
 
+def test_build_records_recursive_dir_discovery(tmp_path):
+    # race runs write transcripts one level deeper: runs/live/<task>/<ep>.jsonl
+    nested = tmp_path / "task_a"
+    nested.mkdir()
+    (nested / "e1.jsonl").write_text(TRANSCRIPTS.read_text().splitlines()[0] + "\n")
+    records, stats = build_records(tmp_path)
+    assert stats["episodes_in"] == 1
+    assert [r["episode_id"] for r in records] == ["alloy-rc-001"]
+
+
+def test_cli_empty_dataset_exits_nonzero_with_clear_error(tmp_path):
+    empty_dir = tmp_path / "empty"
+    empty_dir.mkdir()
+    result = CliRunner().invoke(app, [str(empty_dir), "--out", str(tmp_path / "o.jsonl")])
+    assert result.exit_code == 1
+    assert "no SFT records produced" in result.output
+
+
 def test_split_records_deterministic():
     recs = [{"task_id": str(i), "episode_id": str(i), "messages": [], "mask": []}
             for i in range(10)]

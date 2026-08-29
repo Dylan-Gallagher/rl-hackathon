@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-import time
+import os
 
 from fastapi.testclient import TestClient
 
@@ -102,7 +102,7 @@ def test_new_file_picked_up_between_calls(tmp_path):
     c = TestClient(create_app(tmp_path, refresh_s=0))
     assert c.get("/api/summary").json()["episodes"] == 1
 
-    time.sleep(0.02)
+    os.utime(tmp_path / "a.jsonl")  # force tree-mtime change without sleeping
     write_transcript(
         Transcript(task_id="t", episode_id="e1", policy="solo:m", solved=False),
         tmp_path / "sub" / "b.jsonl",  # nested dir

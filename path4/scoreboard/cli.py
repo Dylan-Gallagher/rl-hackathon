@@ -19,9 +19,11 @@ app = typer.Typer(help="Path 4 live scoreboard: Pass@k / Maj@k over canonical tr
 console = Console()
 
 
-def _load(transcripts_dir: Path):
+def _load(transcripts_dir: Path, ks: tuple[int, ...] | list[int] | None = None):
     ts = scan_transcripts(transcripts_dir)
     races = scan_race_summaries(transcripts_dir)
+    if ks is not None:
+        return aggregate(ts, races, ks=ks), len(ts)
     return aggregate(ts, races), len(ts)
 
 
@@ -47,8 +49,7 @@ def table(
 ) -> None:
     """Print the scoreboard as a rich console table."""
     k_list = [int(k) for k in ks.split(",") if k.strip()]
-    summary, n = _load(transcripts)
-    summary = aggregate(scan_transcripts(transcripts), scan_race_summaries(transcripts), ks=k_list)
+    summary, n = _load(transcripts, ks=k_list)
     if n == 0:
         console.print(f"[yellow]no transcripts found under {transcripts}[/yellow]")
         raise typer.Exit(1)

@@ -23,6 +23,7 @@ CLI (typer): see ``python -m path4.coldstart.build_dataset --help``.
 
 from __future__ import annotations
 
+import glob
 import hashlib
 import json
 import random
@@ -33,7 +34,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from contracts import capped_output, iter_transcripts
+from contracts import capped_output, iter_transcripts  # schemas stay owned by contracts
 
 app = typer.Typer(add_completion=False, help="Build cold-start SFT dataset from success traces.")
 console = Console()
@@ -66,6 +67,24 @@ def record_hash(task_id: str, messages: list[dict]) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def discover_transcripts(paths_or_dir: str | Path) -> list[Path]:
+    """Resolve a dir/file/glob into a deduped list of ``*.jsonl`` files.
+
+    ``contracts.iter_transcripts`` is non-recursive (top-level ``*.jsonl`` of a
+    dir), but race runs write transcripts one level deeper
+    (``runs/live/<task_id>/<episode_id>.jsonl``). So when given a directory we
+    walk the tree ourselves (``rglob``) and hand each file to it — mirroring
+    ``path4/scoreboard/metrics.py``. File and glob args pass through as-is;
+    dedupe in case a glob and rglob could both match.
+    """
+    p = Path(paths_or_dir)
+    if p.is_dir():
+        files = sorted(p.rglob("*.jsonl"))
+    else:
+        files = sorted(Path(x) for x in glob.glob(str(p))) or [p]
+    return list(dict.fromkeys(files))
+
+
 def build_records(
     transcripts_dir: str | Path,
     max_steps: int = 40,
@@ -85,32 +104,33 @@ def build_records(
         "turns_total": 0,
         "by_category": {},
     }
-    for t in iter_transcripts(transcripts_dir):
-        stats["episodes_in"] += 1
-        if not t.solved:
-            stats["episodes_unsolved"] += 1
-            continue
-        if t.steps > max_steps:
-            stats["episodes_too_long"] += 1
-            continue
-        messages = [{"role": m.role, "content": clean_message(m.content, max_chars)}
-                    for m in t.messages]
-        if not any(m["role"] == "assistant" for m in messages):
-            continue  # nothing to learn from
-        h = record_hash(t.task_id, messages)
-        if h in seen:
-            stats["episodes_deduped"] += 1
-            continue
-        seen.add(h)
-        mask = [m["role"] == "assistant" for m in messages]
-        records.append({"task_id": t.task_id, "episode_id": t.episode_id,
-                        "messages": messages, "mask": mask})
-        stats["messages"] += len(messages)
-        stats["assistant_messages"] += sum(mask)
-        stats["turns_total"] += t.steps
-        cat = getattr(t, _CATEGORY_FIELD, None)
-        if cat:
-            stats["by_category"][cat] = stats["by_category"].get(cat, 0) + 1
+    for fp in discover_transcripts(transcripts_dir):
+        for t in iter_transcripts(fp):
+            stats["episodes_in"] += 1
+            if not t.solved:
+                stats["episodes_unsolved"] += 1
+                continue
+            if t.steps > max_steps:
+                stats["episodes_too_long"] += 1
+                continue
+            messages = [{"role": m.role, "content": clean_message(m.content, max_chars)}
+                        for m in t.messages]
+            if not any(m["role"] == "assistant" for m in messages):
+                continue  # nothing to learn from
+            h = record_hash(t.task_id, messages)
+            if h in seen:
+                stats["episodes_deduped"] += 1
+                continue
+            seen.add(h)
+            mask = [m["role"] == "assistant" for m in messages]
+            records.append({"task_id": t.task_id, "episode_id": t.episode_id,
+                            "messages": messages, "mask": mask})
+            stats["messages"] += len(messages)
+            stats["assistant_messages"] += sum(mask)
+            stats["turns_total"] += t.steps
+            cat = getattr(t, _CATEGORY_FIELD, None)
+            if cat:
+                stats["by_category"][cat] = stats["by_category"].get(cat, 0) + 1
     stats["episodes_out"] = len(records)
     return records, stats
 
@@ -166,6 +186,10 @@ def main(
 ):
     """Build the cold-start SFT dataset from alloy success traces."""
     records, stats = build_records(transcripts_dir, max_steps=max_steps, max_chars=max_chars)
+    if not records:
+        console.print("[red]no SFT records produced[/] — check transcripts dir/filtering; "
+                      f"got {stats['episodes_in']} episodes, 0 records out")
+        raise SystemExit(1)
     train, val = split_records(records, val_frac, seed=seed)
     write_jsonl(train, out)
     if val:

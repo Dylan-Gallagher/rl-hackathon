@@ -123,6 +123,14 @@ class MockChatClient:
         self.default = list(default) if default is not None else list(DEFAULT_MOCK_SCRIPT)
         self.calls: list[tuple[str, str]] = []  # (requested_model, content) audit log
 
+    def reset(self) -> None:
+        """Restart all per-model script indices (per-episode reset).
+
+        A single shared client (e.g. the CLI builds one for all tasks) must
+        replay its script from the top on every episode, not run off the end.
+        """
+        self.calls.clear()
+
     async def chat(self, messages: Sequence[dict[str, str]], model: str | None = None) -> dict[str, Any]:
         requested = model or "mock"
         script = self.scripts.get(requested, self.default)

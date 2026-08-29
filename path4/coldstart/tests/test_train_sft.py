@@ -74,6 +74,15 @@ def test_dry_run_cli(tmp_path):
     assert "dry-run OK" in result.output
 
 
+def test_dry_run_cli_empty_dataset_exits_with_clear_error(tmp_path):
+    ds = tmp_path / "empty.jsonl"
+    ds.write_text("")
+    result = RUNNER.invoke(app, ["--dataset", str(ds), "--dry-run"])
+    assert result.exit_code == 1
+    assert "no SFT records produced" in result.output
+    assert "Traceback" not in result.output
+
+
 def test_dry_run_stats():
     stats = dry_run_stats([_record()])
     assert stats["records"] == 1

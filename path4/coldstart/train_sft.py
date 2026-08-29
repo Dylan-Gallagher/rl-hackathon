@@ -211,6 +211,10 @@ def main(
     """Cold-start SFT on alloy success traces (masked, assistant-only loss)."""
     if dry_run:
         records = load_records(dataset)
+        if not records:
+            console.print(f"[red]no SFT records produced[/] — check transcripts dir/filtering; "
+                          f"{dataset} has 0 records")
+            raise SystemExit(1)
         stats = dry_run_stats(records)
         # prove the collator logic end-to-end with the fake tokenizer
         sample = records[0]

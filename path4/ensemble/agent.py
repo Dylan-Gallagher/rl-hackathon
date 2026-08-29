@@ -50,6 +50,7 @@ RULES:
 
 _FINDING_RE = re.compile(r"^FINDING:\s*(.+?)\s*$", re.MULTILINE)
 _FENCE_RE = re.compile(r"```[a-zA-Z0-9_+-]*\s*\n(.*?)```", re.DOTALL)
+_FLAG_LINE_RE = re.compile(r"^\s*FLAG:", re.MULTILINE)
 
 
 def extract_command(content: str) -> tuple[str | None, str]:
@@ -117,6 +118,11 @@ async def run_episode(
     ``stop_event`` lets a racing winner cancel the remaining episodes.
     """
     client = chat_client or default_chat_client()
+    # Deterministic offline scripts are per-EPISODE: a client shared across
+    # tasks (CLI builds one) must restart its script at the top of each run.
+    reset = getattr(client, "reset", None)
+    if callable(reset):
+        reset()
     rng = random.Random(seed if seed is not None else (race_id, policy.name(), task.task_id).__hash__())
     timeout_s = timeout_s if timeout_s is not None else task.horizon.timeout_s
     started = time.monotonic()
@@ -127,65 +133,83 @@ async def run_episode(
         episode_id=episode_id,
         policy=policy.name(),
         split=task.split,
+        category=task.category,
     )
 
-    init = await env.reset(seed=seed)
-    transcript.sandbox_id = str((init.metadata or {}).get("sandbox_id", "")) or None
-    transcript.messages.append(
-        TranscriptMessage(turn=0, role="tool", content=capped_output(init.output, OBS_CONTEXT_CAP))
-    )
-    llm_messages: list[dict[str, str]] = [
-        {"role": "system", "content": SYSTEM_TEMPLATE.format(prompt=task.prompt or task.task_id)},
-        {"role": "user", "content": f"Initial sandbox state:\n{capped_output(init.output, OBS_CONTEXT_CAP)}"},
-    ]
-
-    cancelled = False
-    for turn in range(max_steps):
-        if stop_event is not None and stop_event.is_set():
-            cancelled = True
-            break
-        if time.monotonic() - started > timeout_s:
-            cancelled = True
-            break
-        if findings_inbox is not None:
-            for note in findings_inbox.drain():
-                llm_messages.append(
-                    {"role": "user", "content": f"shared finding from teammate: {note}"}
-                )
-
-        model = await policy.pick_model(turn, rng)
-        reply = await client.chat(llm_messages, model=model)
-        transcript.tokens_in += int(reply.get("tokens_in", 0))
-        transcript.tokens_out += int(reply.get("tokens_out", 0))
-        content = reply.get("content", "")
-        served = reply.get("model") or model
+    try:
+        init = await env.reset(seed=seed)
+        transcript.sandbox_id = str((init.metadata or {}).get("sandbox_id", "")) or None
         transcript.messages.append(
-            TranscriptMessage(turn=turn, role="assistant", content=content, model=served)
+            TranscriptMessage(turn=0, role="tool", content=capped_output(init.output, OBS_CONTEXT_CAP))
         )
-        llm_messages.append({"role": "assistant", "content": content})
+        llm_messages: list[dict[str, str]] = [
+            {"role": "system", "content": SYSTEM_TEMPLATE.format(prompt=task.prompt or task.task_id)},
+            {"role": "user", "content": f"Initial sandbox state:\n{capped_output(init.output, OBS_CONTEXT_CAP)}"},
+        ]
 
-        for note in extract_findings(content):
-            if on_finding is not None:
-                await on_finding(policy.name(), note)
+        cancelled = False
+        for turn in range(max_steps):
+            if stop_event is not None and stop_event.is_set():
+                cancelled = True
+                break
+            if time.monotonic() - started > timeout_s:
+                cancelled = True
+                break
+            if findings_inbox is not None:
+                for note in findings_inbox.drain():
+                    llm_messages.append(
+                        {"role": "user", "content": f"shared finding from teammate: {note}"}
+                    )
 
-        command, nudge = extract_command(content)
-        if command is None:
-            llm_messages.append({"role": "user", "content": nudge})
-            continue
+            model = await policy.pick_model(turn, rng)
+            reply = await client.chat(llm_messages, model=model)
+            transcript.tokens_in += int(reply.get("tokens_in", 0))
+            transcript.tokens_out += int(reply.get("tokens_out", 0))
+            content = reply.get("content", "")
+            served = reply.get("model") or model
+            transcript.messages.append(
+                TranscriptMessage(turn=turn, role="assistant", content=content, model=served)
+            )
+            llm_messages.append({"role": "assistant", "content": content})
 
-        obs = await env.step(command)
-        transcript.steps += 1
-        capped = capped_output(obs.output, OBS_CONTEXT_CAP)
-        transcript.messages.append(TranscriptMessage(turn=turn, role="tool", content=capped))
-        llm_messages.append({"role": "user", "content": f"$ {command}\n{capped}"})
+            for note in extract_findings(content):
+                if on_finding is not None:
+                    await on_finding(policy.name(), note)
 
-        flags = scan_for_flags(obs.output) if task.flag.mode == "generated" else []
-        for f in flags:
-            if f not in transcript.flags_found:
-                transcript.flags_found.append(f)
-        if env.solved():
-            transcript.solved = True
-            break
+            if _FLAG_LINE_RE.match(content):
+                # Terminal convention: a bare `FLAG: ...` reply is the final
+                # answer — record it (appended above), scan it, stop the loop.
+                # Never execute the flag line as a shell command.
+                if task.flag.mode == "generated":
+                    for f in scan_for_flags(content):
+                        if f not in transcript.flags_found:
+                            transcript.flags_found.append(f)
+                break
+
+            command, nudge = extract_command(content)
+            if command is None:
+                llm_messages.append({"role": "user", "content": nudge})
+                continue
+
+            obs = await env.step(command)
+            transcript.steps += 1
+            capped = capped_output(obs.output, OBS_CONTEXT_CAP)
+            transcript.messages.append(TranscriptMessage(turn=turn, role="tool", content=capped))
+            llm_messages.append({"role": "user", "content": f"$ {command}\n{capped}"})
+
+            flags = scan_for_flags(obs.output) if task.flag.mode == "generated" else []
+            for f in flags:
+                if f not in transcript.flags_found:
+                    transcript.flags_found.append(f)
+            if env.solved():
+                transcript.solved = True
+                break
+    finally:
+        # env is per-episode by contract: always tear it down (fix env leak).
+        try:
+            await env.close()
+        except Exception:  # pragma: no cover - close is best-effort
+            logger.warning("env.close() failed for %s", task.task_id, exc_info=True)
 
     if env.solved():
         transcript.solved = True

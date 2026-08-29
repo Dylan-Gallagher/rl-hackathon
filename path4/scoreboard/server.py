@@ -109,6 +109,7 @@ def create_app(transcripts_dir: str | Path, refresh_s: float = 3.0) -> FastAPI:
 
     @app.get("/api/health")
     def health() -> dict[str, Any]:
+        _ensure_fresh()
         return {"ok": True, "transcripts_dir": str(root), "episodes": len(state["episodes"])}
 
     @app.get("/api/summary")

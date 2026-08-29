@@ -41,3 +41,19 @@ def test_capped_output_head_tail():
     assert out.startswith("H" * 60)
     assert out.endswith("T" * 40)
     assert "...[truncated 903 chars]..." in out
+
+
+def test_seeded_flag_mixes_task_identity():
+    from contracts.flag import seeded_flag
+    from contracts.task import Task
+
+    t1 = Task(task_id="task-one", source="custom", category="misc")
+    t2 = Task(task_id="task-two", source="custom", category="misc")
+    # same seed, different tasks -> different flags (no cross-task collision)
+    assert seeded_flag(7, t1) != seeded_flag(7, t2)
+    # same task + seed -> deterministic
+    assert seeded_flag(7, t1) == seeded_flag(7, t1)
+    # explicit task_id param matches task-passed identity
+    assert seeded_flag(7, t1) == seeded_flag(7, task_id="task-one")
+    # bare-seed call (no task) differs from task-mixed derivation
+    assert seeded_flag(7) != seeded_flag(7, t1)

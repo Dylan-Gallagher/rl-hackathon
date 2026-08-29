@@ -21,7 +21,7 @@ from typing import Any, Callable
 
 from contracts.env.base import CTFEnv
 from contracts.task import Task
-from contracts.transcript import Transcript, episode_id_for, write_transcript
+from contracts.transcript import Transcript, TranscriptMessage, episode_id_for, write_transcript
 
 from path4.ensemble.agent import ChatLike, run_episode
 from path4.ensemble.policies import Policy
@@ -137,7 +137,7 @@ async def race(
     winner: str | None = None
     winner_lock = asyncio.Lock()
 
-    async def run_one(policy: Policy) -> Transcript:
+    async def run_one(policy: Policy, policy_seed: int | None) -> Transcript:
         nonlocal winner
         inbox = bus.inbox_for(policy.name()) if bus else None
         on_finding = bus.publish if bus else None
@@ -146,19 +146,34 @@ async def race(
             if on_finding is not None:
                 await on_finding(policy_name, note)
 
-        t = await run_episode(
-            task,
-            policy,
-            chat_client,
-            env_factory(task),
-            max_steps=max_steps,
-            race_id=race_id,
-            on_finding=guarded_on_finding,
-            findings_inbox=inbox,
-            stop_event=stop_event,
-            timeout_s=timeout_s,
-            seed=seed,
-        )
+        try:
+            t = await run_episode(
+                task,
+                policy,
+                chat_client,
+                env_factory(task),
+                max_steps=max_steps,
+                race_id=race_id,
+                on_finding=guarded_on_finding,
+                findings_inbox=inbox,
+                stop_event=stop_event,
+                timeout_s=timeout_s,
+                seed=policy_seed,
+            )
+        except Exception as e:  # a failing policy must not kill the race
+            logger.warning("episode crashed for %s on %s: %s", policy.name(), task.task_id, e)
+            t = Transcript(
+                task_id=task.task_id,
+                episode_id=episode_id_for(
+                    f"{race_id + ':' if race_id else ''}{policy.name()}", task.task_id, 0
+                ),
+                policy=policy.name(),
+                split=task.split,
+                solved=False,
+                category=task.category,
+                messages=[TranscriptMessage(turn=0, role="assistant", content=f"error: {e}")],
+                error=str(e),
+            )
         if t.solved:
             async with winner_lock:
                 if winner is None:
@@ -167,7 +182,12 @@ async def race(
         return t
 
     started = time.monotonic()
-    episodes = list(await asyncio.gather(*(run_one(p) for p in policies)))
+    # Distinct per-policy seeds so racing policies never share a derived flag.
+    episodes = list(
+        await asyncio.gather(
+            *(run_one(p, None if seed is None else seed + i) for i, p in enumerate(policies))
+        )
+    )
     wall_time = time.monotonic() - started
 
     result = RaceResult(
@@ -190,7 +210,9 @@ def write_race_artifacts(result: RaceResult, out_dir: str | Path) -> Path:
     out.mkdir(parents=True, exist_ok=True)
     per_policy: dict[str, dict[str, Any]] = {}
     for t in result.episodes:
-        write_transcript(t, out / f"{t.episode_id}.jsonl")
+        # mode='w': a re-run with the same race_id OVERWRITES per-episode files
+        # instead of appending duplicate lines (scoreboard double-count).
+        write_transcript(t, out / f"{t.episode_id}.jsonl", mode="w")
         per_policy[t.policy] = {
             "solved": t.solved,
             "steps": t.steps,

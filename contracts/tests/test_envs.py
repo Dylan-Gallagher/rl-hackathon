@@ -125,3 +125,17 @@ def test_repl_env_generated_flag_seeded():
 
     f1, f2 = asyncio.run(flags())
     assert f1 == f2 and f1.startswith("flag{")
+
+
+def test_mock_env_same_seed_different_tasks_gives_different_flags():
+    async def flag_for(task_id):
+        task = Task(task_id=task_id, source="custom", category="misc",
+                    flag={"mode": "generated"})
+        env = MockCTFEnv(task)
+        await env.reset(seed=42)
+        obs = await env.step("cat flag.txt")
+        await env.close()
+        return obs.output
+
+    assert asyncio.run(flag_for("task-a")) != asyncio.run(flag_for("task-b"))
+    assert asyncio.run(flag_for("task-a")) == asyncio.run(flag_for("task-a"))

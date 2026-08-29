@@ -39,10 +39,16 @@ def new_flag(task: "Task | None" = None) -> str:
     return f"flag{{{u}}}"
 
 
-def seeded_flag(seed: int, task: "Task | None" = None) -> str:
-    """Deterministic flag for a given seed (reproducible tests/episodes)."""
+def seeded_flag(seed: int, task: "Task | None" = None, task_id: str | None = None) -> str:
+    """Deterministic flag for a given seed (reproducible tests/episodes).
+
+    Task identity (``task_id`` from the param or from ``task``) is mixed into
+    the derived seed so two different tasks replayed with the same numeric
+    seed never collide on the same flag. Same task + same seed is stable.
+    """
     import random
-    rnd = random.Random(f"flag:{seed}")
+    tid = task_id or (task.task_id if task is not None else "")
+    rnd = random.Random(f"flag:{seed}:{tid}")
     u = str(uuid.UUID(int=rnd.getrandbits(128), version=4))
     fmt = getattr(getattr(task, "flag", None), "format", None) if task else None
     if fmt and "{uuid4}" in fmt and fmt != "flag{uuid4}":
@@ -55,11 +61,13 @@ def verify_flag(found: str, expected: str, mode: str, pattern: str | None = None
 
     Modes:
     - ``exact``: string equality (after strip).
-    - ``regex``: ``pattern`` compiled and ``fullmatch`` against ``found``
-      while ``expected`` (the concrete per-episode flag) must equal-match;
-      in practice regex tasks carry the literal flag, so we do exact first,
-      then, if a pattern is supplied, accept a fullmatch of the expected
-      value against the pattern too.
+    - ``regex``: currently requires EXACT equality with the concrete
+      per-episode flag AND, when a ``pattern`` is supplied, that the found
+      value conforms to the pattern. There is no pattern-only verification
+      today: the pattern check cannot accept a flag the expected value does
+      not equal-match (the branch below is behaviorally exact-equality).
+      Future work may support flags verified by pattern conformance alone
+      (where the concrete flag is not known up front).
     - ``script``: verification script executed by the env backend OUTSIDE the
       sandbox (see README §1.5). This function does NOT execute scripts —
       env backends that support script verification must run the task's

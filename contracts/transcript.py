@@ -60,8 +60,11 @@ class Transcript(BaseModel):
     tokens_out: int = 0
 
 
-def write_transcript(t: Transcript, path: str | Path) -> None:
+def write_transcript(t: Transcript, path: str | Path, mode: str = "a") -> None:
     """Append one transcript as a single JSONL line to ``path``.
+
+    Pass ``mode="w"`` to overwrite instead of append (callers that re-run
+    into the same per-episode file must not leave duplicate lines).
 
     JSON-safe by construction (json.dumps) and one-line (no newlines in the
     serialized payload; content newlines are escaped by the encoder).
@@ -70,7 +73,7 @@ def write_transcript(t: Transcript, path: str | Path) -> None:
     assert "\n" not in line  # model_dump_json never emits raw newlines
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as f:
+    with path.open(mode, encoding="utf-8") as f:
         f.write(line + "\n")
 
 

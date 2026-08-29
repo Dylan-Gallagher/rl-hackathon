@@ -147,7 +147,7 @@ async function showPolicy(policy){
     const r = await fetch(`/api/episodes?policy=${encodeURIComponent(policy)}&limit=100`);
     const d = await r.json();
     body.innerHTML = `<div class="traj-meta">${d.total} episodes</div>` + (d.episodes||[]).map(e => `
-      <div class="ep" onclick="showEpisode('${esc(e.episode_id)}')">
+      <div class="ep" onclick="showEpisode('${esc(e.episode_id).replace(/'/g,"&#39;")}')">
         <span class="badge ${e.solved ? "solved" : "failed"}">${e.solved ? "SOLVED" : "miss"}</span>
         ${esc(e.task_id)} <span class="traj-meta" style="display:inline">cat:${esc(e.category)} · ${e.steps|0} steps · ${e.n_messages|0} msgs</span>
       </div>`).join("") || `<div class="empty">no episodes</div>`;

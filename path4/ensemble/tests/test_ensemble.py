@@ -243,3 +243,183 @@ def test_race_winner_transcripts_summary(tmp_path: Path) -> None:
         # episodes that ran at least one step must carry per-turn model names
         if t.steps > 0:
             assert any(m.role == "assistant" and m.model for m in t.messages)
+
+
+# ---- fixes: env close, race crash isolation, seeded flags, category, ----
+# ---- mock-client reset, FLAG: line, re-run double-count              ----
+
+
+class _CloseSpyEnv(MockCTFEnv):
+    """MockCTFEnv that records close() calls."""
+
+    def __init__(self, task):
+        super().__init__(task)
+        self.close_calls = 0
+
+    async def close(self) -> None:
+        self.close_calls += 1
+        await super().close()
+
+
+def test_run_episode_closes_env_on_success() -> None:
+    import asyncio
+
+    task = make_task("close-ok")
+    env = _CloseSpyEnv(task)
+    mc = MockChatClient(scripts={"m": SOLVE_SCRIPT})
+
+    asyncio.run(run_episode(task, SoloPolicy(model="m"), mc, env, max_steps=4, seed=1))
+    assert env.close_calls == 1
+
+
+def test_run_episode_closes_env_on_error() -> None:
+    import asyncio
+
+    task = make_task("close-err")
+    env = _CloseSpyEnv(task)
+
+    class Boom(MockChatClient):
+        async def chat(self, messages, model=None):
+            raise RuntimeError("llm down")
+
+    with pytest.raises(RuntimeError, match="llm down"):
+        asyncio.run(run_episode(task, SoloPolicy(model="m"), Boom(), env, max_steps=4))
+    assert env.close_calls == 1
+
+
+class ExplodingClient(MockChatClient):
+    """Throws for one model, delegates to the scripted mock otherwise."""
+
+    def __init__(self, boom_model: str, **kw):
+        super().__init__(**kw)
+        self.boom_model = boom_model
+
+    async def chat(self, messages, model=None):
+        if model == self.boom_model:
+            raise RuntimeError("llm down")
+        return await super().chat(messages, model=model)
+
+
+def test_race_crashing_policy_becomes_unsolved_episode(tmp_path: Path) -> None:
+    import asyncio
+
+    task = make_task("race-crash-1")
+    mc = ExplodingClient(
+        "boom",
+        scripts={
+            "boom": ["irrelevant"],
+            "fast": ["```bash\nls\n```", "```bash\ncat flag.txt\n```", "FLAG: done"],
+        },
+    )
+
+    async def go():
+        return await race(
+            task,
+            [SoloPolicy(model="boom"), SoloPolicy(model="fast")],
+            make_env_factory("mock"),
+            mc,
+            max_steps=6,
+            out_dir=tmp_path,
+            race_id="crashrace",
+            seed=3,
+        )
+
+    result = asyncio.run(go())
+    assert result.solved and result.winner_policy == "solo:fast"
+    by_policy = {t.policy: t for t in result.episodes}
+    assert by_policy["solo:fast"].solved
+    failed = by_policy["solo:boom"]
+    assert not failed.solved
+    assert "llm down" in str(getattr(failed, "error", ""))
+    assert any("error" in m.content for m in failed.messages)
+
+    # summary + failed transcript on disk
+    summary = json.loads((tmp_path / "summary.json").read_text())
+    assert summary["winner"] == "solo:fast"
+    assert summary["policies"]["solo:boom"]["solved"] is False
+    failed_fp = tmp_path / f"{failed.episode_id}.jsonl"
+    assert failed_fp.exists()
+    t = Transcript.model_validate(json.loads(failed_fp.read_text().strip()))
+    assert not t.solved and getattr(t, "error", "") != ""
+
+
+def test_seeded_flags_differ_per_policy_and_rerun_no_duplicates(tmp_path: Path) -> None:
+    import asyncio
+
+    task = make_task("race-rerun-1")
+    pols = [SoloPolicy(model="mock-a"), SoloPolicy(model="mock-b")]
+    mc = MockChatClient(scripts={"mock-a": SOLVE_SCRIPT, "mock-b": SOLVE_SCRIPT})
+
+    async def go():
+        return await race(
+            task, pols, make_env_factory("mock"), mc, max_steps=6,
+            out_dir=tmp_path, race_id="duprace", seed=5,
+        )
+
+    r1 = asyncio.run(go())
+    # distinct per-policy seeds -> distinct env flags (sandbox_id embeds seed)
+    ids = {t.sandbox_id for t in r1.episodes if t.sandbox_id}
+    assert len(ids) == 2
+
+    r2 = asyncio.run(go())
+    for t in r1.episodes + r2.episodes:
+        fp = tmp_path / f"{t.episode_id}.jsonl"
+        lines = [ln for ln in fp.read_text().splitlines() if ln.strip()]
+        assert len(lines) == 1, f"{fp} has {len(lines)} lines after re-run"
+
+
+def test_transcript_carries_task_category() -> None:
+    import asyncio
+
+    task = Task(task_id="cat-1", source="custom", category="pwn",
+                prompt="Grab the flag from flag.txt.")
+    mc = MockChatClient(scripts={"m": SOLVE_SCRIPT})
+    t = asyncio.run(
+        run_episode(task, SoloPolicy(model="m"), mc, MockCTFEnv(task),
+                    max_steps=4, seed=1)
+    )
+    assert t.solved
+    assert getattr(t, "category", None) == "pwn"
+
+
+def test_shared_mock_client_solves_two_sequential_episodes() -> None:
+    import asyncio
+
+    mc = MockChatClient(scripts={"m": SOLVE_SCRIPT})
+    pol = SoloPolicy(model="m")
+
+    async def go():
+        t1 = await run_episode(make_task("shared-a"), pol, mc, MockCTFEnv(make_task("shared-a")),
+                               max_steps=6, seed=1)
+        t2 = await run_episode(make_task("shared-b"), pol, mc, MockCTFEnv(make_task("shared-b")),
+                               max_steps=6, seed=2)
+        return t1, t2
+
+    t1, t2 = asyncio.run(go())
+    assert t1.solved and t2.solved
+
+
+def test_flag_line_reply_is_final_answer_not_command() -> None:
+    import asyncio
+
+    task = Task(task_id="flagline-1", source="custom", category="misc",
+                flag={"mode": "generated", "verify": "exact"})
+
+    async def learn_flag() -> str:
+        env = MockCTFEnv(task)
+        await env.reset(seed=9)
+        obs = await env.step("cat flag.txt")
+        await env.close()
+        return obs.output
+
+    flag = asyncio.run(learn_flag())
+    mc = MockChatClient(scripts={"m": [f"FLAG: {flag}"]})
+    pol = SoloPolicy(model="m")
+
+    async def go():
+        return await run_episode(task, pol, mc, MockCTFEnv(task), max_steps=5, seed=9)
+
+    t = asyncio.run(go())
+    assert t.steps == 0  # loop broke without executing anything
+    assert not any("command not found" in m.content for m in t.messages)
+    assert flag in t.flags_found

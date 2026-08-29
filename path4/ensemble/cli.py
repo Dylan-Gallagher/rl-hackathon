@@ -29,7 +29,6 @@ from path4.ensemble.llm import ChatClient, MockChatClient
 from path4.ensemble.policies import parse_policy
 from path4.ensemble import racer as racer_mod
 from path4.ensemble.racer import make_env_factory
-from path4.ensemble.agent import run_episode
 
 app = typer.Typer(help="Path 4 ensemble: racing policies + per-turn alloy routing.")
 console = Console()
@@ -97,6 +96,9 @@ def race(
                 max_steps=max_steps,
                 findings_bus=findings_bus,
                 out_dir=Path(out) / task.task_id,
+                # deterministic per task: a re-run into the same out dir
+                # overwrites the same per-episode files (no double-count)
+                race_id=f"cli-{task.task_id}",
             )
         )
         table = Table(title=f"{task.task_id} — race {result.race_id}")
@@ -140,7 +142,7 @@ def episode(
 
     t0 = time.monotonic()
     t = asyncio.run(run_episode(task, pol, client, make_env_factory(env)(task), max_steps=max_steps))
-    write_transcript(t, Path(out))
+    write_transcript(t, Path(out), mode="w")  # re-run overwrites, no duplicates
     console.print(
         f"episode {t.episode_id}: solved={t.solved} steps={t.steps} "
         f"wall={time.monotonic() - t0:.2f}s -> {out}"

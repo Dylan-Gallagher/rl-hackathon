@@ -80,5 +80,14 @@ def run(stats_input, out: str | None = None, band: tuple[float, float] = DEFAULT
 
 
 if __name__ == "__main__":  # tiny manual entry point
-    import sys
-    run(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else None)
+    import argparse
+
+    ap = argparse.ArgumentParser(
+        description="GRPO curriculum from EI pass-rate stats (learnable band, "
+                    "closest-to-20% first)."
+    )
+    ap.add_argument("stats", help="EI stats: JSON path, dict, or list")
+    ap.add_argument("out", nargs="?", default=None,
+                    help="optional output JSON path for the curriculum")
+    args = ap.parse_args()
+    run(args.stats, args.out)
