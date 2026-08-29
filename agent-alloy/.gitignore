@@ -1,0 +1,13 @@
+.env
+secrets/
+.venv/
+benchmark_repo/
+__pycache__/
+*.pyc
+results/runs.jsonl
+results/*.log
+results/transcripts/
+baseline/results/*.jsonl
+baseline/results/*.log
+baseline/results/serving.json
+baseline/results/transcripts/

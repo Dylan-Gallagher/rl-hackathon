@@ -1,0 +1,173 @@
+[
+  {
+    "cid": "backdoorctf2019__team",
+    "name": "team",
+    "ctype": "PWN",
+    "path": "backdoorctf2019/team",
+    "binaries": [
+      "team"
+    ]
+  },
+  {
+    "cid": "ectf2014__knotty",
+    "name": "knotty",
+    "ctype": "PWN",
+    "path": "ectf2014/knotty",
+    "binaries": [
+      "knotty"
+    ]
+  },
+  {
+    "cid": "backdoorctf2019__matrix",
+    "name": "matrix",
+    "ctype": "PWN",
+    "path": "backdoorctf2019/matrix",
+    "binaries": [
+      "matrix"
+    ]
+  },
+  {
+    "cid": "hsctf2019__byte",
+    "name": "byte",
+    "ctype": "PWN",
+    "path": "hsctf2019/byte",
+    "binaries": [
+      "byte"
+    ]
+  },
+  {
+    "cid": "csawctfquals2024__golf",
+    "name": "golf",
+    "ctype": "PWN",
+    "path": "csawctfquals2024/golf",
+    "binaries": [
+      "golf"
+    ]
+  },
+  {
+    "cid": "sekaictf2023__cosmic",
+    "name": "cosmic",
+    "ctype": "PWN",
+    "path": "sekaictf2023/cosmic",
+    "binaries": [
+      "cosmicray"
+    ]
+  },
+  {
+    "cid": "hsctf2019__combo-chain-lite",
+    "name": "combo-chain-lite",
+    "ctype": "PWN",
+    "path": "hsctf2019/combo-chain-lite",
+    "binaries": [
+      "combo-chain-lite"
+    ]
+  },
+  {
+    "cid": "wtfctf2021__prison",
+    "name": "prison",
+    "ctype": "PWN",
+    "path": "wtfctf2021/prison",
+    "binaries": [
+      "prison"
+    ]
+  },
+  {
+    "cid": "hsctf2019__caesars-revenge",
+    "name": "caesars-revenge",
+    "ctype": "PWN",
+    "path": "hsctf2019/caesars-revenge",
+    "binaries": [
+      "caesars-revenge"
+    ]
+  },
+  {
+    "cid": "patriotctf2023__bookshelf",
+    "name": "bookshelf",
+    "ctype": "PWN",
+    "path": "patriotctf2023/bookshelf",
+    "binaries": [
+      "bookshelf"
+    ]
+  },
+  {
+    "cid": "byuctf2023__pwn2038",
+    "name": "pwn2038",
+    "ctype": "PWN",
+    "path": "byuctf2023/pwn2038",
+    "binaries": [
+      "2038"
+    ]
+  },
+  {
+    "cid": "csawctfquals2024__nix",
+    "name": "nix",
+    "ctype": "PWN",
+    "path": "csawctfquals2024/nix",
+    "binaries": [
+      "chal"
+    ]
+  },
+  {
+    "cid": "csaw2017__zone",
+    "name": "zone",
+    "ctype": "PWN",
+    "path": "csaw2017/zone",
+    "binaries": [
+      "zone"
+    ]
+  },
+  {
+    "cid": "csawctfquals2020__applicative",
+    "name": "applicative",
+    "ctype": "PWN",
+    "path": "csawctfquals2020/applicative",
+    "binaries": [
+      "applicative"
+    ]
+  },
+  {
+    "cid": "tamuctf2024__confinement",
+    "name": "confinement",
+    "ctype": "PWN",
+    "path": "tamuctf2024/confinement",
+    "binaries": [
+      "confinement"
+    ]
+  },
+  {
+    "cid": "csaw2017__cvv",
+    "name": "cvv",
+    "ctype": "PWN",
+    "path": "csaw2017/cvv",
+    "binaries": [
+      "cvv"
+    ]
+  },
+  {
+    "cid": "codegate2011__binary100",
+    "name": "binary100",
+    "ctype": "PWN",
+    "path": "codegate2011/binary100",
+    "binaries": [
+      "flagCheck"
+    ]
+  },
+  {
+    "cid": "codegate2011__binary200",
+    "name": "binary200",
+    "ctype": "PWN",
+    "path": "codegate2011/binary200",
+    "binaries": [
+      "flagCheck"
+    ]
+  },
+  {
+    "cid": "neverlan2019__binary1",
+    "name": "binary1",
+    "ctype": "PWN",
+    "path": "neverlan2019/binary1",
+    "binaries": [
+      "flagCheck"
+    ]
+  }
+]
